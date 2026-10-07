@@ -1,45 +1,45 @@
 {
   "total": 8,
-  "validadosComSucesso": 6,
+  "validadosComSucesso": 7,
   "resultados": [
     {
       "id": "cenario-1",
       "descricao": "Texto sem dados sensíveis",
       "original": "Minha internet caiu ontem à noite e a luz do roteador está vermelha. Podem ajudar?",
       "mascarado": "Minha internet caiu ontem à noite e a luz do roteador está vermelha. Podem ajudar?",
-      "tipos": "EMAIL",
+      "tipos": "TELEFONE",
       "ocorrencias": 0,
       "ambiguo": false,
       "revisao": false,
       "sucesso": true,
       "erro": null,
-      "duracaoMs": 16528
+      "duracaoMs": 19529
     },
     {
       "id": "cenario-2",
       "descricao": "E-mail e telefone",
       "original": "Contato: joao@empresa.com ou 84 99999-8888.",
-      "mascarado": "Contato: [EMAIL] ou 84 99999-8888.",
-      "tipos": "EMAIL",
-      "ocorrencias": 1,
+      "mascarado": "Contato: [EMAIL] ou [TELEFONE]",
+      "tipos": "EMAIL, TELEFONE",
+      "ocorrencias": 0,
       "ambiguo": false,
       "revisao": false,
       "sucesso": true,
       "erro": null,
-      "duracaoMs": 5314
+      "duracaoMs": 6232
     },
     {
       "id": "cenario-3",
       "descricao": "Com CPF",
       "original": "O titular é Maria, CPF 123.456.789-00.",
-      "mascarado": null,
-      "tipos": null,
-      "ocorrencias": null,
-      "ambiguo": null,
-      "revisao": null,
-      "sucesso": false,
-      "erro": "Falha ao processar: A IA falhou gravemente ao mascarar os dados. Vazamento interceptado pelo backend.",
-      "duracaoMs": 5420
+      "mascarado": "O titular é Maria, CPF [CPF] e email [EMAIL].",
+      "tipos": "CPF, EMAIL",
+      "ocorrencias": 2,
+      "ambiguo": false,
+      "revisao": false,
+      "sucesso": true,
+      "erro": null,
+      "duracaoMs": 7120
     },
     {
       "id": "cenario-4",
@@ -52,46 +52,46 @@
       "revisao": false,
       "sucesso": true,
       "erro": null,
-      "duracaoMs": 5890
+      "duracaoMs": 9657
     },
     {
       "id": "cenario-5",
       "descricao": "Sequência ambígua (Série)",
       "original": "O roteador pifou. O número de série na etiqueta atrás dele é 748291048572019.",
-      "mascarado": "O roteador pifou. O número de série na etiqueta atrás dele é [CPF].",
-      "tipos": "CPF",
+      "mascarado": "O roteador pifou. O número de série na etiqueta atrás dele é [CARTAO]",
+      "tipos": "CARTAO",
       "ocorrencias": 1,
       "ambiguo": false,
       "revisao": false,
       "sucesso": true,
       "erro": null,
-      "duracaoMs": 6043
+      "duracaoMs": 9814
     },
     {
       "id": "extremo-1",
       "descricao": "Falso Positivo (CEP)",
       "original": "O meu CEP é 59380-000, mandem o técnico aqui.",
-      "mascarado": "59380-000",
+      "mascarado": "O meu CEP é [CEP] aqui.",
       "tipos": "CPF",
       "ocorrencias": 0,
       "ambiguo": false,
       "revisao": false,
       "sucesso": true,
       "erro": null,
-      "duracaoMs": 4579
+      "duracaoMs": 7249
     },
     {
       "id": "extremo-2",
       "descricao": "Formato Sujo (Telefone espaçado)",
       "original": "liga no 8 4 9 9 9 9 9 8 8 8 8 rapido",
-      "mascarado": "[TELEFONE]",
+      "mascarado": "liga no [TELEFONE] rápido",
       "tipos": "TELEFONE",
       "ocorrencias": 1,
       "ambiguo": false,
       "revisao": false,
       "sucesso": true,
       "erro": null,
-      "duracaoMs": 5268
+      "duracaoMs": 6436
     },
     {
       "id": "extremo-3",
@@ -104,7 +104,7 @@
       "revisao": null,
       "sucesso": false,
       "erro": "Falha ao processar: A IA falhou gravemente ao mascarar os dados. Vazamento interceptado pelo backend.",
-      "duracaoMs": 5595
+      "duracaoMs": 6255
     }
   ]
 }
