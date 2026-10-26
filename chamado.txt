@@ -1,0 +1,1 @@
+O utilizador informa que consegue entrar no portal, mas a página de pagamentos mostra cobrança duplicada referente ao mês de outubro.

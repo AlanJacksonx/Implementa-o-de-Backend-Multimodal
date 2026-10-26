@@ -1,98 +1,60 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+Markdown
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+#  Feature 5: Módulo de Mascaramento de Dados (DLP) com IA Local
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Este repositório contém a implementação da **Feature 5**, um sistema de prevenção de perda de dados (Data Loss Prevention - DLP) projetado para anonimizar informações sensíveis em chamados de suporte técnico, garantindo conformidade com a LGPD.
 
-## Description
+**Autores:** Alan Jackson Silva de Medeiros e Daniel Augusto Silva de Goes  
+**Professor:** Luciano Alexandre  
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+##  O Projeto
 
-```bash
-$ npm install
-```
+O objetivo deste módulo é atuar como um *middleware* de segurança. Ele intercepta textos de chamados submetidos pelos utilizadores, localiza Dados Pessoais Identificáveis (PIIs) e substitui-os por tags estruturadas (ex: `[CPF]`, `[EMAIL]`), sem alterar o contexto semântico da frase.
 
-## Compile and run the project
+**Regra de Negócio Principal:** Em respeito ao Princípio da Responsabilidade Única, esta feature **não** interage, resume ou responde ao utilizador. A sua única função é limpar o dado e devolver um contrato JSON rigoroso para as próximas etapas do pipeline do sistema.
 
-```bash
-# development
-$ npm run start
+##  Arquitetura e Segurança (Escudo Duplo)
 
-# watch mode
-$ npm run start:dev
+Como Modelos de Linguagem (LLMs) são probabilísticos e suscetíveis a ataques de *Prompt Injection*, implementámos uma arquitetura de **Programação Defensiva** em duas camadas:
 
-# production mode
-$ npm run start:prod
-```
+1. **Asserção Semântica (IA):** 
+   Utilizamos o **Llama 3.2 (3B)** via Ollama com técnicas de *Few-Shot Prompting*. A IA atua como uma API, sendo proibida de gerar texto livre, respondendo exclusivamente no formato de um contrato JSON predefinido.
+   
+2. **Interceção Determinística (Regex no Backend):**
+   O backend em **NestJS** não confia cegamente no modelo. Ao receber a resposta da IA, o servidor valida o JSON e aplica Expressões Regulares (Regex) para procurar vazamentos. Se a IA falhar e tentar devolver um CPF ou E-mail real, o NestJS aborta a requisição e lança uma exceção `502 Bad Gateway`, protegendo a aplicação.
 
-## Run tests
+##  Tecnologias Utilizadas
 
-```bash
-# unit tests
-$ npm run test
+*   **Backend:** NestJS, TypeScript
+*   **Frontend:** Angular
+*   **Inteligência Artificial:** Ollama (Llama 3.2 3B Instruct) local
+*   **Testes:** Jest
 
-# e2e tests
-$ npm run test:e2e
+##  Como Executar o Projeto
 
-# test coverage
-$ npm run test:cov
-```
+1. **Subir os serviços (Backend, Frontend e Ollama):**
+   ```bash
+   docker compose up -d
 
-## Deployment
+    Aceder à Interface:
+    Abra o navegador em http://localhost:4200 e envie um texto com dados sensíveis (ex: O meu CPF é 111.222.333-44).
+   ```
+ Testes e Validação
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+O sistema possui uma suíte de testes robusta que comprova a sua segurança sem a dependência do contentor da IA ligado:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+    Testes Unitários (Com Mock):
+    Simula a resposta da IA e testa o comportamento de interceção do NestJS.
+    Bash
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+    npm run test
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+    Avaliação de Segurança (Stress Test & Prompt Injection):
+    Um script com 8 cenários complexos (incluindo tentativas de enganar a IA para vazar dados).
+    Bash
 
-## Resources
+    docker compose exec backend npm run avaliar:mascaramento
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Projeto desenvolvido para fins académicos.

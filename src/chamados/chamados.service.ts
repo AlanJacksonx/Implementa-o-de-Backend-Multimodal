@@ -26,6 +26,6 @@ export class ChamadosService {
       throw new BadGatewayException(`O modelo retornou uma categoria inválida: ${resultado.resposta}`);
     }
 
-    return { texto, categoria: categoriaExtraida, modelo: resultado.modelo };
+    return { texto, categoria: categoriaExtraida, modelo: resultado.modelo ?? 'gemma3:4b' };
   }
 }
