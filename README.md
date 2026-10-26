@@ -1,4 +1,3 @@
-```markdown
 # 🧠 Implementação de Backend Multimodal (NestJS + Docker + Ollama)
 
 Este projeto é uma API Backend desenvolvida em **NestJS** que integra capacidades de Inteligência Artificial Multimodal utilizando o **Ollama**. A aplicação é capaz de processar e analisar tanto documentos de texto (txt) quanto imagens (png, jpeg, webp) localmente, sem depender de APIs externas pagas.
