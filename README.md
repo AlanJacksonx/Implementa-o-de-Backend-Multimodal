@@ -1,60 +1,136 @@
-Markdown
+```markdown
+# 🧠 Implementação de Backend Multimodal (NestJS + Docker + Ollama)
 
-#  Feature 5: Módulo de Mascaramento de Dados (DLP) com IA Local
+Este projeto é uma API Backend desenvolvida em **NestJS** que integra capacidades de Inteligência Artificial Multimodal utilizando o **Ollama**. A aplicação é capaz de processar e analisar tanto documentos de texto (txt) quanto imagens (png, jpeg, webp) localmente, sem depender de APIs externas pagas.
 
-Este repositório contém a implementação da **Feature 5**, um sistema de prevenção de perda de dados (Data Loss Prevention - DLP) projetado para anonimizar informações sensíveis em chamados de suporte técnico, garantindo conformidade com a LGPD.
+## 🚀 Tecnologias Utilizadas
 
-**Autores:** Alan Jackson Silva de Medeiros e Daniel Augusto Silva de Goes  
-**Professor:** Luciano Alexandre  
+* **[NestJS](https://nestjs.com/)**: Framework Node.js para construção de backends eficientes e escaláveis.
+* **[Docker & Docker Compose](https://www.docker.com/)**: Para orquestração dos contentores da aplicação e do motor de IA.
+* **[Ollama](https://ollama.com/)**: Plataforma para correr grandes modelos de linguagem (LLMs) localmente.
+* **Modelos IA**: `llava` (para visão e análise de imagens) e `llama3.2:latest` (para processamento de texto).
+* **TypeScript**: Linguagem principal do projeto.
 
 ---
 
-##  O Projeto
+## 📋 Pré-requisitos
 
-O objetivo deste módulo é atuar como um *middleware* de segurança. Ele intercepta textos de chamados submetidos pelos utilizadores, localiza Dados Pessoais Identificáveis (PIIs) e substitui-os por tags estruturadas (ex: `[CPF]`, `[EMAIL]`), sem alterar o contexto semântico da frase.
+Antes de iniciar, certifique-se de que tem as seguintes ferramentas instaladas na sua máquina:
+* [Node.js](https://nodejs.org/) (versão 18 ou superior)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (com o motor Docker a correr)
+* [Git](https://git-scm.com/)
 
-**Regra de Negócio Principal:** Em respeito ao Princípio da Responsabilidade Única, esta feature **não** interage, resume ou responde ao utilizador. A sua única função é limpar o dado e devolver um contrato JSON rigoroso para as próximas etapas do pipeline do sistema.
+---
 
-##  Arquitetura e Segurança (Escudo Duplo)
+## ⚙️ Instalação e Configuração
 
-Como Modelos de Linguagem (LLMs) são probabilísticos e suscetíveis a ataques de *Prompt Injection*, implementámos uma arquitetura de **Programação Defensiva** em duas camadas:
+**1. Clone o repositório:**
+```bash
+git clone [https://github.com/AlanJacksonx/Implementa-o-de-Backend-Multimodal.git](https://github.com/AlanJacksonx/Implementa-o-de-Backend-Multimodal.git)
+cd Implementa-o-de-Backend-Multimodal
 
-1. **Asserção Semântica (IA):** 
-   Utilizamos o **Llama 3.2 (3B)** via Ollama com técnicas de *Few-Shot Prompting*. A IA atua como uma API, sendo proibida de gerar texto livre, respondendo exclusivamente no formato de um contrato JSON predefinido.
-   
-2. **Interceção Determinística (Regex no Backend):**
-   O backend em **NestJS** não confia cegamente no modelo. Ao receber a resposta da IA, o servidor valida o JSON e aplica Expressões Regulares (Regex) para procurar vazamentos. Se a IA falhar e tentar devolver um CPF ou E-mail real, o NestJS aborta a requisição e lança uma exceção `502 Bad Gateway`, protegendo a aplicação.
+```
 
-##  Tecnologias Utilizadas
+**2. Instale as dependências do NestJS:**
 
-*   **Backend:** NestJS, TypeScript
-*   **Frontend:** Angular
-*   **Inteligência Artificial:** Ollama (Llama 3.2 3B Instruct) local
-*   **Testes:** Jest
+```bash
+npm install
 
-##  Como Executar o Projeto
+```
 
-1. **Subir os serviços (Backend, Frontend e Ollama):**
-   ```bash
-   docker compose up -d
+**3. Configure as Variáveis de Ambiente:**
+Crie um ficheiro chamado `.env` na raiz do projeto e adicione as seguintes configurações:
 
-    Aceder à Interface:
-    Abra o navegador em http://localhost:4200 e envie um texto com dados sensíveis (ex: O meu CPF é 111.222.333-44).
-   ```
- Testes e Validação
+```env
+OLLAMA_BASE_URL=[http://127.0.0.1:11434](http://127.0.0.1:11434)
+OLLAMA_MODEL=llava
+OLLAMA_TIMEOUT_MS=120000
 
-O sistema possui uma suíte de testes robusta que comprova a sua segurança sem a dependência do contentor da IA ligado:
+```
 
-    Testes Unitários (Com Mock):
-    Simula a resposta da IA e testa o comportamento de interceção do NestJS.
-    Bash
+*(Nota: O timeout está configurado para 120 segundos para permitir o carregamento seguro do modelo visual na primeira execução).*
 
-    npm run test
+---
 
-    Avaliação de Segurança (Stress Test & Prompt Injection):
-    Um script com 8 cenários complexos (incluindo tentativas de enganar a IA para vazar dados).
-    Bash
+## 🏃 Como Executar o Projeto
 
-    docker compose exec backend npm run avaliar:mascaramento
+A inicialização do projeto é simplificada através de um script de arranque que orquestra os contentores Docker.
 
-Projeto desenvolvido para fins académicos.
+**1. Levante a infraestrutura:**
+No terminal da raiz do projeto, execute:
+
+```bash
+node iniciar.js
+
+```
+
+*(Isto irá criar e iniciar os contentores do Backend e do Ollama em segundo plano).*
+
+**2. Descarregue o modelo de Inteligência Artificial:**
+Como a aplicação utiliza o modelo **LLaVA** para processamento multimodal (texto e imagem), é necessário descarregá-lo para dentro do contentor do Ollama (este processo só precisa de ser feito uma vez):
+
+```bash
+docker compose exec ollama ollama pull llava
+
+```
+
+*(Aguarde até o download atingir 100% e indicar "success").*
+
+---
+
+## 🧪 Testando a API
+
+A aplicação expõe o endpoint `POST /ia/analisar-arquivo` que aceita requisições do tipo `multipart/form-data`.
+
+### Opção 1: Teste automatizado via Script (Texto)
+
+O projeto inclui um script que cria automaticamente um ficheiro `chamado.txt` e o envia para a IA categorizar:
+
+```bash
+node testar.js
+
+```
+
+### Opção 2: Teste Multimodal via Thunder Client / Postman (Imagens)
+
+Para testar a capacidade de visão da IA, crie uma nova requisição na sua ferramenta de testes de API:
+
+1. **Método:** `POST`
+2. **URL:** `http://localhost:3000/ia/analisar-arquivo`
+3. **Body:** Selecione `Form-data` (ou `Form` no Thunder Client).
+4. **Campos:**
+* `prompt` (Texto): *Insira a sua pergunta, ex: "O que você vê nesta imagem?"*
+* `arquivo` (Ficheiro): *Selecione uma imagem (.jpg, .png, .webp) do seu computador.*
+
+
+5. **Enviar!**
+
+A API irá devolver um JSON detalhado com a descrição gerada pela IA, o modelo utilizado e a contagem de tokens de entrada/saída.
+
+---
+
+## 🏗️ Estrutura da Arquitetura de IA
+
+O sistema de IA foi desenhado utilizando o padrão **Provider**, permitindo trocar o motor de inferência no futuro sem alterar a lógica de negócio:
+
+* `ModeloProvider`: Classe abstrata que define os contratos de geração de resposta e análise de ficheiros.
+* `OllamaProvider`: Implementação concreta que comunica com o contentor local do Ollama.
+* `IaService`: Serviço central que valida os ficheiros recebidos (`Multer`) e orquestra a comunicação com o provider de IA.
+
+---
+
+## 👨‍💻 Autoria
+
+Desenvolvido por **Alan Jackson Silva de Medeiros** durante o programa de especialização e integração de arquiteturas backend com Inteligência Artificial.
+
+```
+
+Pode copiar este código inteiro (do `#` inicial até à secção de Autoria) e colar dentro de um ficheiro chamado **`README.md`** na raiz do seu projeto. 
+
+Depois disso, basta fazer os mesmos comandos do Git que lhe mostrei antes para enviar este novo ficheiro para o seu repositório:
+```bash
+git add README.md
+git commit -m "docs: adiciona README detalhado do projeto"
+git push origin main
+
+```
