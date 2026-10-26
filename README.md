@@ -120,7 +120,7 @@ O sistema de IA foi desenhado utilizando o padrão **Provider**, permitindo troc
 
 ## 👨‍💻 Autoria
 
-Desenvolvido por **Alan Jackson Silva de Medeiros** durante o programa de especialização e integração de arquiteturas backend com Inteligência Artificial.
+Desenvolvido por **Alan Jackson Silva de Medeiros** e **Daniel Augusto Silva de Goes** durante o programa de especialização e integração de arquiteturas backend com Inteligência Artificial.
 
 ```
 
